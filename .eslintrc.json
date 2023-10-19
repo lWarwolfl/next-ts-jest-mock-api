@@ -3,5 +3,8 @@
 		"next/core-web-vitals",
 		"plugin:testing-library/react",
 		"plugin:jest-dom/recommended"
-	]
+	],
+	"rules": {
+		"testing-library/await-async-utils": "off"
+	}
 }

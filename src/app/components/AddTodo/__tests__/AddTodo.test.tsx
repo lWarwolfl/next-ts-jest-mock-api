@@ -1,84 +1,78 @@
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import AddTodo from '../AddTodo'
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import AddTodo from "../AddTodo";
 
-const mockSetTodos = jest.fn()
+const mockSetTodos = jest.fn();
 
-describe('AddTodo', () => {
+describe("AddTodo", () => {
+	describe("Render", () => {
+		it("should render the input", () => {
+			render(<AddTodo setTodos={mockSetTodos} />); // ARRANGE
 
-    describe('Render', () => {
+			const input = screen.getByPlaceholderText("New Todo"); //ACT
 
-        it('should render the input', () => {
-            render(<AddTodo setTodos={mockSetTodos} />) // ARRANGE
+			expect(input).toBeInTheDocument(); // ASSERT
+		});
 
-            const input = screen.getByPlaceholderText('New Todo') //ACT
+		it("should render a disabled submit button", () => {
+			render(<AddTodo setTodos={mockSetTodos} />); // ARRANGE
 
-            expect(input).toBeInTheDocument()// ASSERT
-        })
+			//ACT
+			const button = screen.getByRole("button", {
+				name: "Submit",
+			});
 
-        it('should render a disabled submit button', () => {
-            render(<AddTodo setTodos={mockSetTodos} />) // ARRANGE
+			expect(button).toBeDisabled(); // ASSERT
+		});
+	});
 
-            //ACT
-            const button = screen.getByRole('button', {
-                name: 'Submit'
-            })
+	describe("Behavior", () => {
+		it("should be able to add text to the input", async () => {
+			render(<AddTodo setTodos={mockSetTodos} />); // ARRANGE
 
-            expect(button).toBeDisabled()// ASSERT
-        })
+			const input = screen.getByPlaceholderText("New Todo"); //ACT
+			await userEvent.type(input, "hey there");
+			expect(input).toHaveValue("hey there"); // ASSERT
+		});
 
-    })
+		it("should enable the submit button when text is input", async () => {
+			render(<AddTodo setTodos={mockSetTodos} />); // ARRANGE
 
-    describe('Behavior', () => {
+			const input = screen.getByPlaceholderText("New Todo"); //ACT
+			await userEvent.type(input, "hey there");
 
-        it('should be able to add text to the input', async () => {
-            render(<AddTodo setTodos={mockSetTodos} />) // ARRANGE
+			const button = screen.getByRole("button", {
+				name: "Submit",
+			});
 
-            const input = screen.getByPlaceholderText('New Todo') //ACT
-            await userEvent.type(input, 'hey there')
-            expect(input).toHaveValue("hey there")// ASSERT
-        })
+			expect(button).toBeEnabled(); // ASSERT
+		});
 
-        it('should enable the submit button when text is input', async () => {
-            render(<AddTodo setTodos={mockSetTodos} />) // ARRANGE
+		it("should empty the text input when submitted", async () => {
+			render(<AddTodo setTodos={mockSetTodos} />); // ARRANGE
 
-            const input = screen.getByPlaceholderText('New Todo') //ACT
-            await userEvent.type(input, 'hey there')
+			const input = screen.getByPlaceholderText("New Todo"); //ACT
+			await userEvent.type(input, "hey there");
+			const button = screen.getByRole("button", {
+				name: "Submit",
+			});
+			await userEvent.click(button);
+			waitFor(() => {
+				expect(input).toHaveValue(""); // ASSERT
+			});
+		});
 
-            const button = screen.getByRole('button', {
-                name: 'Submit'
-            })
+		it("should call setTodos when submitted", async () => {
+			render(<AddTodo setTodos={mockSetTodos} />); // ARRANGE
 
-            expect(button).toBeEnabled() // ASSERT
-        })
+			const input = screen.getByPlaceholderText("New Todo"); //ACT
+			await userEvent.type(input, "hey there");
+			const button = screen.getByRole("button", {
+				name: "Submit",
+			});
+			await userEvent.click(button);
 
-        it('should empty the text input when submitted', async () => {
-            render(<AddTodo setTodos={mockSetTodos} />) // ARRANGE
-
-            const input = screen.getByPlaceholderText('New Todo') //ACT
-            await userEvent.type(input, 'hey there')
-            const button = screen.getByRole('button', {
-                name: 'Submit'
-            })
-            await userEvent.click(button)
-            waitFor(() => {
-                expect(input).toHaveValue("")// ASSERT
-            })
-
-        })
-
-        it('should call setTodos when submitted', async () => {
-            render(<AddTodo setTodos={mockSetTodos} />) // ARRANGE
-
-            const input = screen.getByPlaceholderText('New Todo') //ACT
-            await userEvent.type(input, 'hey there')
-            const button = screen.getByRole('button', {
-                name: 'Submit'
-            })
-            await userEvent.click(button)
-
-            expect(mockSetTodos).toBeCalled()// ASSERT
-        })
-
-    })
-})
+			expect(mockSetTodos).toBeCalled(); // ASSERT
+		});
+	});
+});
