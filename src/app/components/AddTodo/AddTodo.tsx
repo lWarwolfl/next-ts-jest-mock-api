@@ -1,5 +1,6 @@
 import { useState, FormEvent } from "react"
 import type { Todo } from "@/types/Todo"
+import postTodo from "@/lib/postTodo/postTodo"
 
 type Props = {
     setTodos: React.Dispatch<React.SetStateAction<Todo[]>>
@@ -13,13 +14,15 @@ export default function AddItemForm({ setTodos }: Props) {
 
         if (!item) return
 
-        setTodos(prev => {
-            const highestId = [...prev].sort((a, b) => b.id - a.id)[0].id
+        try {
+            const savedTodo = await postTodo(item)
 
-            return [...prev, { userId: 1, title: item, completed: false, id: highestId + 1 }]
-        })
+            setTodos(prev => [...prev, savedTodo])
 
-        setItem("")
+            setItem("")
+        } catch (err) {
+            if (err instanceof Error) console.log(err.message)
+        }
 
     }
 

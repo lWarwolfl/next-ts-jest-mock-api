@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AddTodo from '../AddTodo'
 
@@ -61,8 +61,10 @@ describe('AddTodo', () => {
                 name: 'Submit'
             })
             await userEvent.click(button)
+            waitFor(() => {
+                expect(input).toHaveValue("")// ASSERT
+            })
 
-            expect(input).toHaveValue("")// ASSERT
         })
 
         it('should call setTodos when submitted', async () => {

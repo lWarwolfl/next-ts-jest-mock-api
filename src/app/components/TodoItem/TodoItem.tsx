@@ -1,8 +1,8 @@
 
 import { FaTrash } from "react-icons/fa"
 import { ChangeEvent, MouseEvent } from 'react'
-// import updateTodo from "@/lib/updateTodo"
-// import deleteTodo from "@/lib/deleteTodo"
+import updateTodo from "@/lib/updateTodo/updateTodo"
+import deleteTodo from "@/lib/deleteTodo/deleteTodo"
 import type { Todo } from "@/types/Todo"
 
 
@@ -14,13 +14,21 @@ type Props = {
 export default function TodoItem({ todo, setTodos }: Props) {
 
     const handleChange = async (e: ChangeEvent<HTMLInputElement>) => {
-        //const updatedTodo = await updateTodo(todo)
-        setTodos(prevTodos => [...prevTodos.filter(prev => prev.id !== todo.id), { ...todo, completed: !todo.completed }])
+        try {
+            const updatedTodo = await updateTodo(todo)
+            setTodos(prevTodos => [...prevTodos.filter(prev => prev.id !== todo.id), updatedTodo])
+        } catch (err) {
+            if (err instanceof Error) console.log(err.message)
+        }
     }
 
     const handleDelete = async (e: MouseEvent<HTMLButtonElement>) => {
-        //await deleteTodo(todo)
-        setTodos(prev => [...prev.filter(td => td.id !== todo.id)])
+        try {
+            await deleteTodo(todo)
+            setTodos(prev => [...prev.filter(td => td.id !== todo.id)])
+        } catch (err) {
+            if (err instanceof Error) console.log(err.message)
+        }
     }
 
     return (
